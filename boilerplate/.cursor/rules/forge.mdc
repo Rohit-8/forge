@@ -1,0 +1,46 @@
+---
+description: Project-wide rules and command index for the forge framework. Always-on context for Cursor.
+alwaysApply: true
+---
+
+# forge — Cursor rules
+
+This project uses forge, a small framework for disciplined agent-assisted
+delivery. You MUST follow these rules at all times in this repository.
+
+## Cross-cutting hard rules
+
+1. **Manual VCS.** Read-only git only (`status`, `diff`, `log`, `show`).
+   NEVER run `add`, `commit`, `push`, `tag`, `merge`, `rebase`, `reset`,
+   `checkout -B`, `switch -c`, `stash`, `clean`, or anything `--force`.
+2. **Database read-only by default.** No DB connection unless the user's
+   message explicitly opens one with `db:<env>-readonly`, `db:<env>-write`,
+   or `db:admin:<reason>`. Full policy: `.forge/db-policy.yaml`.
+3. **Token budgets.** Honour `.forge/budget.yaml`. Cache before scan, scan
+   before read. No whole-repo reads.
+4. **One-shot clarification.** Max 3 questions per task, batched into a
+   single message, with a recommended default. No drip-feeding.
+5. **Programmatic gates.** Before declaring a task done, run every gate
+   in `.forge/gates.yaml`. Blocking gates must pass.
+6. **Constitution.** Re-read `.forge/constitution.md` at the start of every
+   non-trivial task and enforce it.
+
+## Commands
+
+When the user invokes a forge command (`/forge.do`, `/forge.init`, etc.) or
+asks you to "run the forge.X workflow", read the canonical spec at
+`.forge/agents/forge.<name>.md` and follow it literally.
+
+| Command          | Spec                                  |
+|------------------|---------------------------------------|
+| `/forge.init`    | `.forge/agents/forge.init.md`         |
+| `/forge.do`      | `.forge/agents/forge.do.md`           |
+| `/forge.audit`   | `.forge/agents/forge.audit.md`        |
+| `/forge.evolve`  | `.forge/agents/forge.evolve.md`       |
+| `/forge.scan`    | `.forge/agents/forge.scan.md`         |
+| `/forge.config`  | `.forge/agents/forge.config.md`       |
+
+## Project constitution
+
+The full set of project-specific rules lives in `.forge/constitution.md`.
+Treat it as canonical and re-read it before any non-trivial change.

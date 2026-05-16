@@ -1,0 +1,48 @@
+# Programmatic gates run before any /forge.do or /forge.evolve reports done.
+# Exit 0 = pass. Override per-project as needed.
+#
+# Commands marked `auto` are filled in by the installer based on the detected
+# stack (see .forge/stack.json). You can replace them with whatever your
+# project actually uses. If a command is empty, the gate is logged as
+# SKIPPED (never silently green).
+#
+# The four built-in gates (secrets, owasp_fast, conventions, constitution)
+# run on Node 18+ and work on Windows, macOS, and Linux.
+
+gates:
+  lint:
+    run: "auto"            # e.g. "npm run lint", "ruff check .", "dotnet format --verify-no-changes"
+    blocking: true
+
+  types:
+    run: "auto"            # e.g. "npx tsc --noEmit", "mypy .", "dotnet build", "go vet ./..."
+    blocking: true
+
+  tests:
+    run: "auto"            # e.g. "npm test --silent", "pytest -q", "dotnet test --nologo", "go test ./..."
+    blocking: true
+
+  coverage:
+    run: "auto"
+    blocking: true
+    threshold: 80          # percent; overridden by constitution `tests.coverage.min` if set
+
+  secrets:
+    run: "node .forge/gates/secrets.mjs"
+    blocking: true
+
+  owasp_fast:
+    run: "node .forge/gates/owasp-fast.mjs"
+    blocking: true
+
+  deps:
+    run: "auto"            # e.g. "npm audit --audit-level=high", "pip-audit", "cargo audit"
+    blocking: false        # advisory by default; flip to true to enforce
+
+  conventions:
+    run: "node .forge/gates/conventions.mjs"
+    blocking: true
+
+  constitution:
+    run: "node .forge/gates/constitution.mjs"
+    blocking: true

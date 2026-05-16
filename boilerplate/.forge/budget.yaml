@@ -1,0 +1,64 @@
+# Token budgets per forge command.
+# Soft = start trimming (prefer cache, summary scans).
+# Hard = abort the command with a partial report.
+#
+# Two preset tiers ship in-box; /forge.init picks one based on repo size:
+#   small    : < 5,000 source files       (typical SPA / micro-service)
+#   medium   : 5,000 - 20,000 source files (multi-package monorepo)
+#   large    : 20,000 - 60,000 source files (enterprise platform, e.g. T360)
+#   xlarge   : > 60,000 source files       (mega-monorepo)
+#
+# /forge.init writes the chosen preset into `budget.active` below.
+# You may override any specific number; the active block wins.
+
+budget:
+  active: medium      # set automatically by /forge.init; override freely
+
+  presets:
+    small:
+      init:   { soft:  40000, hard:  80000 }
+      do:     { soft:  25000, hard:  60000 }
+      audit:  { soft:  30000, hard:  70000 }
+      evolve: { soft:  30000, hard:  70000 }
+      scan:   { soft:   8000, hard:  20000 }
+
+    medium:
+      init:   { soft:  80000, hard: 180000 }
+      do:     { soft:  40000, hard: 100000 }
+      audit:  { soft:  60000, hard: 150000 }
+      evolve: { soft:  50000, hard: 130000 }
+      scan:   { soft:  12000, hard:  30000 }
+
+    large:
+      init:   { soft: 200000, hard: 500000 }   # one-time scan of ~38K .cs files
+      do:     { soft:  60000, hard: 150000 }   # 5-layer change Standard+Legacy
+      audit:  { soft: 100000, hard: 250000 }   # repo-wide sweep
+      evolve: { soft:  80000, hard: 200000 }   # cross-layer refactor
+      scan:   { soft:  20000, hard:  50000 }   # Q&A across many solutions
+
+    xlarge:
+      init:   { soft: 400000, hard: 900000 }
+      do:     { soft: 100000, hard: 250000 }
+      audit:  { soft: 180000, hard: 400000 }
+      evolve: { soft: 140000, hard: 350000 }
+      scan:   { soft:  35000, hard:  80000 }
+
+policy:
+  preferCache: true
+  maxFileBytesReadable: 51200           # 50 KB; larger requires explicit reason
+  shardProfileWhen:
+    files: 20000                        # split profile.json per top-level area
+    bytes: 524288                       # 512 KB profile triggers sharding
+  bannedFullReads:
+    - "**/package-lock.json"
+    - "**/yarn.lock"
+    - "**/pnpm-lock.yaml"
+    - "**/*.csproj.user"
+    - "**/dist/**"
+    - "**/build/**"
+    - "**/coverage/**"
+    - "**/node_modules/**"
+    - "**/bin/**"
+    - "**/obj/**"
+    - "**/packages/**"                  # NuGet packages folder
+    - "**/TestResults/**"

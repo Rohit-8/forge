@@ -1,0 +1,60 @@
+# Database access policy. Enforced by the agent before opening any connection.
+
+default: db:none
+
+# Allowed connection modes (agent refuses anything else)
+modes:
+  - db:none                # no connection
+  - db:dev-readonly
+  - db:test-readonly
+  - db:staging-readonly
+  - db:dev-write           # requires per-statement db:write:<reason>
+  - db:test-write          # requires per-statement db:write:<reason>
+
+# Statement allow-list per mode
+allow:
+  readonly:
+    - SELECT
+    - SHOW
+    - DESCRIBE
+    - EXPLAIN
+    - "WITH"             # only when terminating in SELECT
+  write:
+    - INSERT
+    - UPDATE
+    - DELETE
+    - MERGE
+
+# Always denied unless db:admin:<reason> is supplied AND human re-confirms
+admin:
+  - CREATE
+  - ALTER
+  - DROP
+  - TRUNCATE
+  - RENAME
+  - GRANT
+  - REVOKE
+  - DENY
+  - EXEC
+  - EXECUTE
+  - CALL
+  - BACKUP
+  - RESTORE
+  - "BULK INSERT"
+
+limits:
+  maxQueriesPerCommand: 5
+  maxRowsPerQuery: 1000
+  maxWallClockSeconds: 30
+  maxParallelConnections: 1
+
+piiRedactColumnsRegex: "(?i)email|ssn|dob|name|phone|address|token|secret|password"
+
+# Migrations: the agent generates files but never runs them.
+migrations:
+  generateOnly: true
+  forbiddenCommands:
+    - "dotnet ef database update"
+    - "alembic upgrade head"
+    - "rails db:migrate"
+    - "npx prisma migrate deploy"
