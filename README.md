@@ -9,6 +9,12 @@ research silently → propose one plan in chat → write RED tests → write
 GREEN code → run programmatic gates → propose a commit. The human always
 holds the keys to git and the database.
 
+<p align="center">
+  <img src="public/choose-agents.png" alt="Pick a forge agent from Copilot's agent picker" width="380" />
+  &nbsp;&nbsp;
+  <img src="public/use-agent.png" alt="Invoke /forge.do with a brief" width="380" />
+</p>
+
 ---
 
 ## What forge gives you
